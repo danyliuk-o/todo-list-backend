@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 
 const app = express();
-const PORT = 5000;
+const PORT = 4000;
 
 app.use(cors());
 app.use(express.json());
@@ -13,6 +13,9 @@ type TodoItem = {
   title: string;
   completed: boolean;
 };
+
+// "База даних" в оперативній пам'яті — скидається при кожному перезапуску сервера
+let todos: TodoItem[] = [];
 
 app.get("/api/todos", (req: Request, res: Response) => {
   res.json(todos);
@@ -34,6 +37,24 @@ app.post("/api/todos", (req: Request, res: Response) => {
 
   todos.push(newTodo);
   res.status(201).json(newTodo);
+});
+
+app.patch("/api/todos/:id", (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const { completed } = req.body;
+
+  const todo = todos.find((todo) => todo.id === id);
+
+  if (!todo) {
+    res.status(404).json({ error: "Todo not found" });
+    return;
+  }
+
+  if (typeof completed === "boolean") {
+    todo.completed = completed;
+  }
+
+  res.json(todo);
 });
 
 app.delete("/api/todos/:id", (req: Request, res: Response) => {
