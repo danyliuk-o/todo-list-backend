@@ -1,3 +1,4 @@
+import "./env.js";
 import { app } from "./app.js";
 
 // Entry point: start the server

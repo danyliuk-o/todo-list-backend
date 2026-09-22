@@ -1,40 +1,57 @@
+import { supabase } from "../lib/supabaseClient.js";
 import { TodoItem } from "../types/todo.types.js";
 
-// In-memory "database" — resets on every server restart
-let todos: TodoItem[] = [];
-
-// Data-access layer: only layer allowed to touch the `todos` array directly
+// Data-access layer: only layer allowed to talk to Supabase directly
 export const todoRepository = {
-  findAll(): TodoItem[] {
-    return todos;
+  async findAll(): Promise<TodoItem[]> {
+    const { data, error } = await supabase
+      .from("todos")
+      .select("*")
+      .order("created_at");
+
+    if (error) throw error;
+    return data;
   },
 
-  findById(id: string): TodoItem | undefined {
-    return todos.find((todo) => todo.id === id);
+  async findById(id: string): Promise<TodoItem | undefined> {
+    const { data, error } = await supabase
+      .from("todos")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data ?? undefined;
   },
 
-  create(title: string): TodoItem {
-    const newTodo: TodoItem = {
-      id: Date.now().toString(),
-      title,
-      completed: false,
-    };
+  async create(title: string): Promise<TodoItem> {
+    const { data, error } = await supabase
+      .from("todos")
+      .insert({ title })
+      .select()
+      .single();
 
-    todos.push(newTodo);
-    return newTodo;
+    if (error) throw error;
+    return data;
   },
 
-  updateCompleted(id: string, completed: boolean): TodoItem | undefined {
-    const todo = todoRepository.findById(id);
+  async updateCompleted(
+    id: string,
+    completed: boolean,
+  ): Promise<TodoItem | undefined> {
+    const { data, error } = await supabase
+      .from("todos")
+      .update({ completed })
+      .eq("id", id)
+      .select()
+      .maybeSingle();
 
-    if (todo) {
-      todo.completed = completed;
-    }
-
-    return todo;
+    if (error) throw error;
+    return data ?? undefined;
   },
 
-  remove(id: string): void {
-    todos = todos.filter((todo) => todo.id !== id);
+  async remove(id: string): Promise<void> {
+    const { error } = await supabase.from("todos").delete().eq("id", id);
+    if (error) throw error;
   },
 };
