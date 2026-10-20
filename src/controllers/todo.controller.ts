@@ -5,8 +5,8 @@ import { todoService } from "../services/todo.service.js";
 // Errors thrown here (including rejected promises — Express 5 forwards those
 // automatically) are caught by Express and forwarded to the error-handling middleware.
 export const todoController = {
-  async getAll(_req: Request, res: Response) {
-    res.json(await todoService.getAllTodos());
+  async getAll(req: Request, res: Response) {
+    res.json(await todoService.getAllTodos(req.query.search));
   },
 
   async create(req: Request, res: Response) {
