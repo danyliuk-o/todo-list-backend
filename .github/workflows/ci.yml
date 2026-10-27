@@ -1,0 +1,28 @@
+name: CI
+
+# Коли запускати: на кожен пуш у будь-яку гілку і на кожен pull request у main
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    # Чиста віртуальна машина з Linux, яку GitHub створює на час запуску
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Завантажити код репозиторію на машину
+      - uses: actions/checkout@v4
+
+      # 2. Поставити Node.js тієї ж версії, що й локально; кешувати npm-пакети
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # 3. Поставити залежності точно за package-lock.json (на відміну від npm install)
+      - run: npm ci
+
+      # 4. Перевірити типи TypeScript
+      - run: npm run typecheck
