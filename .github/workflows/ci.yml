@@ -8,15 +8,16 @@ on:
 
 jobs:
   check:
-    # Чиста віртуальна машина з Linux, яку GitHub створює на час запуску
-    runs-on: ubuntu-latest
+    # Чиста віртуальна машина з Linux, яку GitHub створює на час запуску.
+    # Версію зафіксовано (не ubuntu-latest), щоб CI не змінювався сам по собі
+    runs-on: ubuntu-24.04
 
     steps:
       # 1. Завантажити код репозиторію на машину
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # 2. Поставити Node.js тієї ж версії, що й локально; кешувати npm-пакети
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
