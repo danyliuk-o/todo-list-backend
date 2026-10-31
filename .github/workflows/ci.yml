@@ -27,3 +27,7 @@ jobs:
 
       # 4. Перевірити типи TypeScript
       - run: npm run typecheck
+
+      # 5. Запустити тести. Репозиторій у них замінено фейком,
+      #    тому база і DATABASE_URL у CI не потрібні
+      - run: npm test
